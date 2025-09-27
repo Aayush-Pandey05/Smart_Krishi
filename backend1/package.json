@@ -13,6 +13,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@langchain/core": "^0.3.77",
+    "@langchain/openai": "^0.6.13",
     "axios": "^1.12.2",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
@@ -35,6 +37,7 @@
     "passport": "^0.7.0",
     "sharp": "^0.34.4",
     "socket.io": "^4.8.1",
-    "validator": "^13.15.15"
+    "validator": "^13.15.15",
+    "zod": "^3.25.76"
   }
 }

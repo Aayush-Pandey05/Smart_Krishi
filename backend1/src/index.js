@@ -1,11 +1,13 @@
 import express from "express";
 import authRoutes from "./routes/auth.route.js";
 import processRoutes from "./routes/process.route.js";
+import irrigationRoutes from "./routes/irrigation.route.js";
 // import dataRoutes from "./routes/data.route.js";
 // import contactRoutes from "./routes/contact.route.js";
 // import feedbackRoutes from "./routes/feedback.route.js";
 import dotenv from "dotenv";
-import './models/data.model.js';
+import "./models/data.model.js";
+import "./models/irrigation.model.js";
 import { connectDb } from "./lib/db.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -25,6 +27,7 @@ app.use(
 
 app.use("/api/auth", authRoutes);
 app.use("/api/processing", processRoutes);
+app.use("/api/irrigation", irrigationRoutes);
 // app.use("/api/data", dataRoutes);
 // app.use("/api/contact", contactRoutes);
 // app.use("/api/feedback", feedbackRoutes);

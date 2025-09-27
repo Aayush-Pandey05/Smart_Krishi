@@ -54,6 +54,12 @@ export const useAuthStore = create((set) => ({
     try {
       await axiosInstance.post("/auth/logout");
       set({ authUser: null });
+
+      // Clear localStorage on logout
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("currentAdvice");
+      }
+
       toast.success("Logged out successfully");
       return { success: true };
     } catch (error) {
