@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight } from "lucide-react";
 
 import RightPanelSignup from "../components/RightPanelSignup";
+import { useAuthStore } from "../store/useAuthStore";
+import { useNavigate } from "react-router";
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -12,9 +14,11 @@ const Signup = () => {
     password: "",
     confirmPassword: "",
   });
-  const [isSigningUp, setIsSigningUp] = useState(false);
+  // const [isSigningUp, setIsSigningUp] = useState(false);
   const [focusedInput, setFocusedInput] = useState(null);
   const [message, setMessage] = useState(null);
+  const { signUp, isSigningUp } = useAuthStore();
+  const Navigate = useNavigate();
 
   // Custom message modal to replace alert()
   const MessageModal = ({ message, onClose, type }) => {
@@ -68,15 +72,16 @@ const Signup = () => {
     return true;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      setIsSigningUp(true);
-      setTimeout(() => {
-        // Mock signup process - just simulate a delay
-        setMessage({ text: "Account created successfully! Welcome to JalSetu!", type: "success" });
-        setIsSigningUp(false);
-      }, 1000);
+      const { confirmPassword: _, ...signUpData } = formData;
+      try {
+        await signUp(signUpData);
+        Navigate("/");
+      } catch (error) {
+        console.error("Signup failed:", error);
+      }
     }
   };
 
