@@ -1,208 +1,95 @@
-import React, { useState, useEffect, useRef } from "react";
-import gsap from "gsap";
-import { NavLink, useLocation } from "react-router-dom";
-import { MenuIcon, XIcon, ArrowRightIcon } from "./Icon"; // Assuming these are in your project
-import logo from '../assets/Logo.png'
+import React, { useEffect, useRef } from "react";
+import { NavLink } from "react-router-dom";
+import { gsap } from "gsap";
+import logo from '../assets/Logo.png'; // Make sure this path is correct
 
-// 1. Updated navLinks for the AgriAI website with simplified paths
+// Import icons from lucide-react
+import {
+  LayoutGrid,
+  ScanLine,
+  Sprout,
+  Calculator,
+  Droplets,
+  FlaskConical,
+  LogOut
+} from "lucide-react";
+
 const navLinks = [
-{ name: "Dashboard", path: "/marketdashboard" },
-{ name: "Disease Detection", path: "/disease" },
-{ name: "Soil Health", path: "/soilhealth" },
-{ name: "Cost Calculator", path: "/costcal" },
-{ name: "Irrigation Advisor", path: "/irrigation" },
-{ name: "Fertilizer Guide", path: "/fertilizer" },
-
-
+  { name: "Dashboard", path: "/marketdashboard", icon: LayoutGrid },
+  { name: "Disease Detection", path: "/disease", icon: ScanLine },
+  { name: "Soil Health", path: "/soilhealth", icon: Sprout },
+  { name: "Cost Calculator", path: "/costcal", icon: Calculator },
+  { name: "Irrigation Advisor", path: "/irrigation", icon: Droplets },
+  { name: "Fertilizer Guide", path: "/fertilizer", icon: FlaskConical },
 ];
 
 const Header2 = () => {
-const [isMenuOpen, setIsMenuOpen] = useState(false);
-const [isScrolled, setIsScrolled] = useState(false);
-const location = useLocation();
+  const sidebarRef = useRef(null);
 
-const headerRef = useRef(null);
-const logoRef = useRef(null);
-const navRef = useRef(null);
-const buttonRef = useRef(null);
+  useEffect(() => {
+    // Animate the sidebar sliding in from the left
+    gsap.from(sidebarRef.current, {
+      x: -256, // This should match the width of the sidebar (w-64)
+      duration: 0.8,
+      ease: "power3.out",
+    });
+  }, []);
 
-
-useEffect(() => {
-const hero = document.getElementById("hero");
-if (!hero) return;
-
-const observer = new IntersectionObserver(
-    ([entry]) => {
-    setIsScrolled(!entry.isIntersecting);
-    },
-    { threshold: 0 }
-);
-
-observer.observe(hero);
-return () => observer.disconnect();
-}, []);
-
-// GSAP intro animation (no changes needed)
-useEffect(() => {
-const headerEl = headerRef.current;
-const logoEl = logoRef.current;
-const navItems = navRef.current?.children || [];
-const buttonEl = buttonRef.current;
-
-const tl = gsap.timeline();
-tl.from(headerEl, {
-    y: -50,
-    opacity: 0,
-    duration: 0.8,
-    ease: "power3.out",
-})
-    .from([logoEl, buttonEl], {
-    opacity: 0,
-    y: -20,
-    duration: 0.5,
-    ease: "power3.out",
-    }, "-=0.3")
-    .from(navItems, {
-    opacity: 0,
-    y: -20,
-    duration: 0.4,
-    ease: "power3.out",
-    stagger: 0.1,
-    }, "-=0.3");
-}, []);
-
-// 2. Simplified helper function to check if a link is active
-const isLinkActive = (linkPath) => {
-return location.pathname === linkPath;
-};
-
-const getDesktopLinkClassName = (linkPath) => {
-const isActive = isLinkActive(linkPath);
-return `text-lg font-medium transition-colors duration-700 hover:text-gray-400 ${
-    isActive
-    ? isScrolled
-        ? "text-gray-800" :"text-green-600 font-bold" // Active link color when scrolled
-                // Active link color on hero
-    : isScrolled
-    ? "text-white"                // Inactive link color when scrolled
-    : "text-green-400"                // Inactive link color on hero
-}`;
-};
-
-const getMobileLinkClassName = (linkPath) => {
-const isActive = isLinkActive(linkPath);
-return `text-white hover:text-gray-300 transition-colors duration-300 ${
-    isActive ? "text-green-400 font-bold" : ""
-}`;
-};
-
-return (
-<>
-    <header
-    ref={headerRef}
-    className={`fixed z-50 top-5 left-4 right-4 p-2 rounded-3xl transition-all duration-700 ${
-        isScrolled ? "bg-green-700 opacity-10 shadow-lg":"bg-black/80" 
-    }`}
+  return (
+    <aside
+      ref={sidebarRef}
+      className="w-64 h-screen bg-black text-gray-300 flex flex-col p-4 fixed left-0 top-0 z-50 border-r border-gray-800"
     >
-    <div className="px-4 sm:px-6 flex items-center justify-between h-16">
-        {/* Logo */}
-        <div
-        ref={logoRef}
-        className="flex items-center cursor-pointer group space-x-3"
-        >
+      {/* Logo and Brand Name */}
+      <div className="flex items-center gap-3 mb-10 px-2">
         <img
-            src={logo} 
-            alt=" "
-            className="h-8 w-8 rounded-full"
+          src={logo}
+          alt="AgroAI Logo"
+          className="h-9 w-9 rounded-full"
         />
-        <span
-            className={`text-xl lg:text-2xl font-bold group-hover:text-green-400 transition-colors duration-700 ${
-            isScrolled ? "text-white":"text-green-500"
-            }`}
-        >
-            KrishiAI 
-        </span>
-        </div>
-        
-        <nav ref={navRef} className="hidden md:flex items-center gap-3 space-x-6">
-        {navLinks.map((link) => (
-            <NavLink
-            key={link.name}
-            to={link.path}
-            className={getDesktopLinkClassName(link.path)}
-            >
-            {link.name}
-            </NavLink>
-        ))}
-        </nav>
+        <span className="text-2xl font-bold text-white">AgroAI</span>
+      </div>
 
+      {/* Navigation Links */}
+      <nav className="flex-grow">
+        <ul className="space-y-2">
+          {navLinks.map((link) => (
+            <li key={link.name}>
+              <NavLink
+                to={link.path}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-3 py-2.5 rounded-md text-base font-medium transition-colors ${
+                    isActive
+                      ? "bg-gray-800 text-white"
+                      : "hover:bg-gray-800"
+                  }`
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    <link.icon
+                      className={`w-5 h-5 ${
+                        isActive ? "text-green-400" : "text-gray-400"
+                      }`}
+                    />
+                    {link.name}
+                  </>
+                )}
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      </nav>
 
-        <div ref={buttonRef} className="flex items-center space-x-4">
-        {/* Get Started Button */}
-        <NavLink
-            to="/features" // Or your desired link
-            className={`group flex items-center space-x-3 pl-4 pr-1 py-1 rounded-full transition-colors duration-700 ${
-            isScrolled ? "bg-white text-black": "bg-green-600 text-white"
-            }`}
-        >
-            <span className="font-semibold hidden sm:inline">Go to Home</span> 
-            <div
-            className={`p-2 rounded-full transition-colors duration-700 ${
-                isScrolled ? "bg-green-400 text-white":"bg-white text-black" 
-            }`}
-            >
-            <ArrowRightIcon />
-            </div>
-        </NavLink>
-
-        {/* Mobile Toggle */}
-        <div
-            className={`rounded-full block md:hidden transition-colors duration-700 ${
-            isScrolled ? "bg-black":"bg-white" 
-            }`}
-        >
-            <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className={`p-2 rounded-full transition-colors duration-700 ${
-                isScrolled
-                ? "text-white hover:bg-gray-800":"text-black hover:bg-gray-200"
-            }`}
-            >
-            {isMenuOpen ? <XIcon /> : <MenuIcon />}
-            </button>
-        </div>
-        </div>
-    </div>
-    </header>
-
-    {/* Mobile Menu Overlay - Simplified */}
-    <div
-    className={`fixed inset-0 z-40 bg-black/90 text-white transform transition-transform duration-700 ease-in-out ${
-        isMenuOpen ? "translate-x-0" : "translate-x-full"
-    } md:hidden`}
-    >
-    <div className="flex flex-col items-center justify-center h-full space-y-8 text-2xl font-bold">
-        {navLinks.map((link) => (
-        <NavLink
-            key={link.name}
-            to={link.path}
-            className={getMobileLinkClassName(link.path)}
-            onClick={() => setIsMenuOpen(false)}
-        >
-            {link.name}
-        </NavLink>
-        ))}
-        <NavLink
-        to="/features"
-        onClick={() => setIsMenuOpen(false)}
-        className="mt-6 px-6 py-3 rounded-full bg-white text-black hover:bg-gray-200 transition-colors"
-        >
-        Back to Home
-        </NavLink>
-    </div>
-    </div>
-</>
-);
+      {/* Logout Button */}
+      <div className="mt-auto">
+        <button className="flex w-full items-center gap-3 px-3 py-2.5 rounded-md text-base font-medium hover:bg-gray-800 transition-colors">
+          <LogOut className="w-5 h-5 text-gray-400" />
+          Logout
+        </button>
+      </div>
+    </aside>
+  );
 };
 
 export default Header2;

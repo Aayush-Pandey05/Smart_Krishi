@@ -29,9 +29,9 @@ const WhyChooseUs = () => {
 
   const features = [
     "AI-powered crop disease detection",
-    "Real-time market price analysis",
+
     "Personalized farming recommendations",
-    "Cost optimization tools",
+    
     "Sustainable farming practices",
     "Mobile-friendly interface",
   ];

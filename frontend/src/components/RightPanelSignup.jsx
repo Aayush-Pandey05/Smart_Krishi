@@ -11,11 +11,11 @@ const RightPanelSignup = () => {
         <div className="text-center px-12 space-y-6">
           <div className="space-y-4">
             <h3 className="text-4xl font-bold text-white leading-tight">
-              Every Drop Counts
+              Every Farmer Counts
             </h3>
             <p className="text-xl text-slate-200 leading-relaxed">
               Join thousands of communities already making a difference through
-              intelligent water harvesting
+              Smart Agriculture Technicques
             </p>
           </div>
 
