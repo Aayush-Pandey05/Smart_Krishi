@@ -9,13 +9,14 @@ import IrrigationAdvisor from "./pages/IrrigationAdvisor";
 import FertilizerGuide from "./pages/FertilizerGuide";
 import DiseaseDetection from "./pages/DiseaseDetection";
 import Feature from "./pages/Feature";
-import MarketDashboard from "./pages/MarketDashboard";
+// import MarketDashboard from "./pages/MarketDashboard";
 import Signup from "./pages/SignUp";
 import Login from "./pages/Login";
 import { useAuthStore } from "./store/useAuthStore";
 import { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
 import { Loader } from "lucide-react";
+import Dashboard from "./pages/Dashboard";
 
 const App = () => {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
@@ -45,7 +46,7 @@ const App = () => {
         <Route path="/fertilizer" element={<FertilizerGuide />} />
         <Route path="/disease" element={<DiseaseDetection />} />
         <Route path="/features" element={<Feature />} />
-        <Route path="/marketdashboard" element={<MarketDashboard />} />
+        <Route path="/marketdashboard" element={<Dashboard />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
       </Routes>
