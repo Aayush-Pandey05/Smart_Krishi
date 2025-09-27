@@ -10,6 +10,8 @@ import FertilizerGuide from "./pages/FertilizerGuide";
 import DiseaseDetection from "./pages/DiseaseDetection";
 import Feature from "./pages/Feature";
 import MarketDashboard from "./pages/MarketDashboard";
+import Signup from "./pages/SignUp";
+import Login from "./pages/Login";
 import { useAuthStore } from "./store/useAuthStore";
 import { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
@@ -44,6 +46,8 @@ const App = () => {
         <Route path="/disease" element={<DiseaseDetection />} />
         <Route path="/features" element={<Feature />} />
         <Route path="/marketdashboard" element={<MarketDashboard />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
       </Routes>
       <Toaster />
     </div>
