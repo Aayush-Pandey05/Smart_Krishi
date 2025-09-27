@@ -2,21 +2,26 @@ import React, { useState } from "react";
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from "lucide-react";
 
 import RightPannel from "../components/RightPannel";
+import { useAuthStore } from "../store/useAuthStore";
+import { useNavigate } from "react-router";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [focusedInput, setFocusedInput] = useState(null);
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  // const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [message, setMessage] = useState(null);
+  const { login, isLoggingIn } = useAuthStore();
+  const navigate = useNavigate();
 
   // Custom message modal to replace alert()
   const MessageModal = ({ message, onClose, type }) => {
     const modalClasses = `fixed inset-0 z-50 flex items-center justify-center p-4 ${
-      type === 'success' ? 'bg-green-600/30' : 'bg-red-600/30'
+      type === "success" ? "bg-green-600/30" : "bg-red-600/30"
     } backdrop-blur-sm`;
     const cardClasses = `bg-slate-800 p-6 rounded-lg shadow-xl border-2 ${
-      type === 'success' ? 'border-green-500' : 'border-red-500'
+      type === "success" ? "border-green-500" : "border-red-500"
     } text-white max-w-sm w-full space-y-4 text-center`;
 
     return (
@@ -34,19 +39,15 @@ const Login = () => {
     );
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoggingIn(true);
-    // Simulate a brief delay to show the loading state
-    setTimeout(() => {
-      // Simple validation without a backend
-      if (formData.email && formData.password) {
-        setMessage({ text: "Login successful! Welcome to JalSetu!", type: "success" });
-      } else {
-        setMessage({ text: "Please enter both email and password.", type: "error" });
-      }
-      setIsLoggingIn(false);
-    }, 1000);
+    try {
+      await login(formData);
+      navigate("/");
+    } catch (error) {
+      toast.error("Login failed. Please check your credentials.");
+      console.error("Login failed:", error);
+    }
   };
 
   const handleChange = (e) => {
@@ -91,9 +92,13 @@ const Login = () => {
                   placeholder="Enter your email"
                   value={formData.email}
                   onChange={handleChange}
-                  onFocus={() => setFocusedInput('email')}
+                  onFocus={() => setFocusedInput("email")}
                   onBlur={() => setFocusedInput(null)}
-                  className={`w-full bg-slate-800/60 border-2 ${focusedInput === 'email' ? 'border-cyan-500' : 'border-slate-700'} rounded-xl px-11 py-3.5 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-all duration-300 backdrop-blur-sm`}
+                  className={`w-full bg-slate-800/60 border-2 ${
+                    focusedInput === "email"
+                      ? "border-cyan-500"
+                      : "border-slate-700"
+                  } rounded-xl px-11 py-3.5 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-all duration-300 backdrop-blur-sm`}
                   required
                 />
               </div>
@@ -111,9 +116,13 @@ const Login = () => {
                   placeholder="Enter your password"
                   value={formData.password}
                   onChange={handleChange}
-                  onFocus={() => setFocusedInput('password')}
+                  onFocus={() => setFocusedInput("password")}
                   onBlur={() => setFocusedInput(null)}
-                  className={`w-full bg-slate-800/60 border-2 ${focusedInput === 'password' ? 'border-cyan-500' : 'border-slate-700'} rounded-xl px-11 py-3.5 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-all duration-300 backdrop-blur-sm pr-12`}
+                  className={`w-full bg-slate-800/60 border-2 ${
+                    focusedInput === "password"
+                      ? "border-cyan-500"
+                      : "border-slate-700"
+                  } rounded-xl px-11 py-3.5 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-all duration-300 backdrop-blur-sm pr-12`}
                   required
                 />
                 <button
@@ -121,13 +130,20 @@ const Login = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-cyan-400 transition-colors p-1"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </button>
               </div>
             </div>
 
             <div className="text-right">
-              <a href="#" className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors">
+              <a
+                href="#"
+                className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
+              >
                 Forgot your password?
               </a>
             </div>
@@ -154,7 +170,10 @@ const Login = () => {
           <div className="text-center">
             <span className="text-slate-400">
               Don't have an account?{" "}
-              <a href="/signup" className="text-cyan-400 hover:text-cyan-300 font-medium transition-colors">
+              <a
+                href="/signup"
+                className="text-cyan-400 hover:text-cyan-300 font-medium transition-colors"
+              >
                 Create account
               </a>
             </span>
@@ -164,10 +183,15 @@ const Login = () => {
 
       {/* Right Panel - Static Visual */}
       <RightPannel />
-      
-      {/* Message Modal */}
-      {message && <MessageModal message={message.text} onClose={handleCloseMessage} type={message.type} />}
 
+      {/* Message Modal */}
+      {message && (
+        <MessageModal
+          message={message.text}
+          onClose={handleCloseMessage}
+          type={message.type}
+        />
+      )}
     </div>
   );
 };
