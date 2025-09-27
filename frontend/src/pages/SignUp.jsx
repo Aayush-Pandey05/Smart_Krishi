@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight } from "lucide-react";
 
 import RightPanelSignup from "../components/RightPanelSignup";
-import logo from '../assets/Logo.png';
+import logo from "../assets/Logo.png";
 import { useAuthStore } from "../store/useAuthStore";
 import { useNavigate } from "react-router";
 
@@ -23,10 +23,10 @@ const Signup = () => {
   // Custom message modal to replace alert()
   const MessageModal = ({ message, onClose, type }) => {
     const modalClasses = `fixed inset-0 z-50 flex items-center justify-center p-4 ${
-      type === 'success' ? 'bg-green-600/30' : 'bg-red-600/30'
+      type === "success" ? "bg-green-600/30" : "bg-red-600/30"
     } backdrop-blur-sm`;
     const cardClasses = `bg-gray-800 p-6 rounded-lg shadow-xl border-2 ${
-      type === 'success' ? 'border-green-500' : 'border-red-500'
+      type === "success" ? "border-green-500" : "border-red-500"
     } text-white max-w-sm w-full space-y-4 text-center`;
 
     return (
@@ -62,7 +62,10 @@ const Signup = () => {
       return false;
     }
     if (formData.password.length < 6) {
-      setMessage({ text: "Password must be at least 6 characters", type: "error" });
+      setMessage({
+        text: "Password must be at least 6 characters",
+        type: "error",
+      });
       return false;
     }
     if (formData.password !== formData.confirmPassword) {
@@ -81,7 +84,10 @@ const Signup = () => {
         Navigate("/");
       } catch (error) {
         console.error("Signup failed:", error);
-        setMessage({ text: error.message || "An error occurred during signup.", type: "error" });
+        setMessage({
+          text: error.message || "An error occurred during signup.",
+          type: "error",
+        });
       }
     }
   };
@@ -89,7 +95,7 @@ const Signup = () => {
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
-  
+
   const handleCloseMessage = () => {
     setMessage(null);
   };
@@ -102,7 +108,7 @@ const Signup = () => {
         <div className="relative z-10 w-full max-w-md space-y-6">
           <div className="text-center">
             <div className="inline-flex items-center space-x-3 mb-6">
-               <img
+              <img
                 src={logo}
                 alt="AgroAI Logo"
                 className="h-8 w-8 rounded-full"
@@ -275,10 +281,15 @@ const Signup = () => {
 
       <RightPanelSignup />
 
-      {message && <MessageModal message={message.text} onClose={handleCloseMessage} type={message.type} />}
+      {message && (
+        <MessageModal
+          message={message.text}
+          onClose={handleCloseMessage}
+          type={message.type}
+        />
+      )}
     </div>
   );
 };
-
 
 export default Signup;

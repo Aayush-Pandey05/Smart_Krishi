@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
 
 import RightPanelSignup from "../components/RightPanelSignup"; // Corrected component name
-import logo from '../assets/Logo.png';
+import logo from "../assets/Logo.png";
 import { useAuthStore } from "../store/useAuthStore";
 
 const Login = () => {
@@ -17,14 +17,16 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.email || !formData.password) {
-        toast.error("Please enter both email and password.");
-        return;
+      toast.error("Please enter both email and password.");
+      return;
     }
     try {
       await login(formData);
       navigate("/"); // Redirect to dashboard on successful login
     } catch (error) {
-      toast.error(error.message || "Login failed. Please check your credentials.");
+      toast.error(
+        error.message || "Login failed. Please check your credentials."
+      );
       console.error("Login failed:", error);
     }
   };
@@ -41,7 +43,7 @@ const Login = () => {
         <div className="relative z-10 w-full max-w-md space-y-8">
           <div className="text-center">
             <div className="inline-flex items-center space-x-3 mb-8">
-               <img
+              <img
                 src={logo}
                 alt="AgroAI Logo"
                 className="h-8 w-8 rounded-full"
@@ -69,9 +71,13 @@ const Login = () => {
                   placeholder="Enter your email"
                   value={formData.email}
                   onChange={handleChange}
-                  onFocus={() => setFocusedInput('email')}
+                  onFocus={() => setFocusedInput("email")}
                   onBlur={() => setFocusedInput(null)}
-                  className={`w-full bg-gray-800/60 border-2 ${focusedInput === 'email' ? 'border-green-500' : 'border-gray-700'} rounded-xl px-11 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-green-500 transition-all duration-300 backdrop-blur-sm`}
+                  className={`w-full bg-gray-800/60 border-2 ${
+                    focusedInput === "email"
+                      ? "border-green-500"
+                      : "border-gray-700"
+                  } rounded-xl px-11 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-green-500 transition-all duration-300 backdrop-blur-sm`}
                   required
                 />
               </div>
@@ -89,9 +95,13 @@ const Login = () => {
                   placeholder="Enter your password"
                   value={formData.password}
                   onChange={handleChange}
-                  onFocus={() => setFocusedInput('password')}
+                  onFocus={() => setFocusedInput("password")}
                   onBlur={() => setFocusedInput(null)}
-                  className={`w-full bg-gray-800/60 border-2 ${focusedInput === 'password' ? 'border-green-500' : 'border-gray-700'} rounded-xl px-11 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-green-500 transition-all duration-300 backdrop-blur-sm pr-12`}
+                  className={`w-full bg-gray-800/60 border-2 ${
+                    focusedInput === "password"
+                      ? "border-green-500"
+                      : "border-gray-700"
+                  } rounded-xl px-11 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-green-500 transition-all duration-300 backdrop-blur-sm pr-12`}
                   required
                 />
                 <button
@@ -99,13 +109,20 @@ const Login = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-green-400 transition-colors p-1"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </button>
               </div>
             </div>
 
             <div className="text-right">
-              <a href="#" className="text-sm text-green-400 hover:text-green-300 transition-colors">
+              <a
+                href="#"
+                className="text-sm text-green-400 hover:text-green-300 transition-colors"
+              >
                 Forgot your password?
               </a>
             </div>
@@ -132,7 +149,10 @@ const Login = () => {
           <div className="text-center">
             <span className="text-gray-400">
               Don't have an account?{" "}
-              <a href="/signup" className="text-green-400 hover:text-green-300 font-medium transition-colors">
+              <a
+                href="/signup"
+                className="text-green-400 hover:text-green-300 font-medium transition-colors"
+              >
                 Create account
               </a>
             </span>
@@ -142,7 +162,6 @@ const Login = () => {
 
       {/* Right Panel - Static Visual */}
       <RightPanelSignup />
-      
     </div>
   );
 };

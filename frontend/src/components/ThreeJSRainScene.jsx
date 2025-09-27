@@ -8,7 +8,7 @@ const ThreeJSAgroScene = () => {
     if (!mountRef.current) return;
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0c140c); 
+    scene.background = new THREE.Color(0x0c140c);
 
     const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -35,7 +35,10 @@ const ThreeJSAgroScene = () => {
       positions[i * 3 + 1] = Math.random() * 20;
       positions[i * 3 + 2] = (Math.random() - 0.5) * 50;
     }
-    sporeGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    sporeGeometry.setAttribute(
+      "position",
+      new THREE.BufferAttribute(positions, 3)
+    );
     const sporeMaterial = new THREE.PointsMaterial({
       color: 0x84cc16,
       size: 0.08,
@@ -167,4 +170,3 @@ const ThreeJSAgroScene = () => {
 };
 
 export default ThreeJSAgroScene;
-

@@ -1,44 +1,97 @@
-import React, { useState, useLayoutEffect, useRef, useCallback, useEffect } from 'react';
-import { useDropzone } from 'react-dropzone';
-import { gsap } from 'gsap';
-import { UploadCloud, Check, Bell } from 'lucide-react';
-import Header2 from '../components/Header2';
+import React, {
+  useState,
+  useLayoutEffect,
+  useRef,
+  useCallback,
+  useEffect,
+} from "react";
+import { useDropzone } from "react-dropzone";
+import { gsap } from "gsap";
+import {
+  Camera,
+  UploadCloud,
+  AlertTriangle,
+  Loader2,
+  CheckCircle,
+  TrendingUp,
+} from "lucide-react";
+import Header2 from "../components/Header2";
+import { useFormStore } from "../store/useFormStore";
 
 const DiseaseDetectionPage = () => {
-  const [file, setFile] = useState(null); // Corrected syntax: = useState
+  const [file, setFile] = useState(null);
   const componentRef = useRef(null);
 
-  // GSAP animation setup
+  // Get store data and actions
+  const {
+    userDiseaseData,
+    isUploading,
+    isLoadingData,
+    currentPrediction,
+    currentRecommendation,
+    uploadImage,
+    getUserDiseaseData,
+    clearCurrentData,
+  } = useFormStore();
+
   useLayoutEffect(() => {
     let ctx = gsap.context(() => {
       gsap.from(".animate-in", {
         opacity: 0,
-        y: 20,
-        duration: 0.6,
-        stagger: 0.1,
-        ease: 'power3.out',
+        y: 40,
+        duration: 0.8,
+        stagger: 0.2,
+        ease: "power3.out",
       });
     }, componentRef);
     return () => ctx.revert();
   }, []);
 
+  // Load user data on component mount
+  useEffect(() => {
+    const loadUserData = async () => {
+      await getUserDiseaseData();
+    };
+
+    loadUserData();
+
+    // Cleanup function
+    return () => {
+      if (file) {
+        URL.revokeObjectURL(file.preview);
+      }
+    };
+  }, []);
+
   // React Dropzone setup
-  const onDrop = useCallback(acceptedFiles => {
+  const onDrop = useCallback((acceptedFiles) => {
     const acceptedFile = acceptedFiles[0];
     if (acceptedFile) {
-      setFile(Object.assign(acceptedFile, {
-        preview: URL.createObjectURL(acceptedFile)
-      }));
+      setFile(
+        Object.assign(acceptedFile, {
+          preview: URL.createObjectURL(acceptedFile),
+        })
+      );
     }
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: { 'image/*': ['.png', '.jpg', '.jpeg'] },
+    accept: { "image/*": [".jpeg", ".jpg", ".png"] },
     multiple: false,
   });
 
-  // Cleanup the object URL
+  // Handle diagnosis
+  const handleStartDiagnosis = async () => {
+    if (file) {
+      const result = await uploadImage(file);
+      if (result.success) {
+        // Keep the file for preview but the data will be loaded from store
+      }
+    }
+  };
+
+  // Cleanup the object URL to prevent memory leaks
   useEffect(() => {
     return () => {
       if (file) {
@@ -47,122 +100,263 @@ const DiseaseDetectionPage = () => {
     };
   }, [file]);
 
-  const photographyTips = [
-    { text: "Clear Focus: Ensure the leaf is in sharp focus." },
-    { text: "Good Lighting: Use natural, even lighting. Avoid shadows." },
-    { text: "Plain Background: Place the leaf on a neutral, contrasting background." },
-    { text: "Fill the Frame: The leaf should take up most of the image area." },
-    { text: "Show Symptoms: Capture the part of the leaf showing disease symptoms clearly." },
-  ];
+  const renderRecommendationCard = () => {
+    if (isLoadingData) {
+      return (
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="w-6 h-6 animate-spin text-green-600 mr-2" />
+          <span className="text-gray-600">Loading your data...</span>
+        </div>
+      );
+    }
 
-  const handleAnalyze = () => {
-      if (!file) return;
-      alert(`Analyzing image: ${file.name}`);
-      // Add your image analysis API call here
-  };
+    if (!currentPrediction || !currentRecommendation) {
+      return (
+        <div className="text-center py-16">
+          <Camera className="w-16 h-16 mx-auto text-gray-300 mb-4" />
+          <h3 className="text-xl font-semibold text-gray-800">
+            Upload an Image to Start
+          </h3>
+          <p className="text-gray-500 mt-2 max-w-xs mx-auto">
+            Select a clear image of the affected leaf to get AI-powered disease
+            diagnosis.
+          </p>
+        </div>
+      );
+    }
 
-  return (
-    <div className="bg-black">
-      <Header2 />
-      <main ref={componentRef} className="ml-64 flex-1 bg-[#121212] min-h-screen p-8">
-        <header className="flex items-center justify-between mb-8">
-          <div className="animate-in">
-            <h1 className="text-3xl font-bold text-white">Crop Disease Detection</h1>
-            <p className="mt-2 text-gray-400">Upload an image of a plant leaf to detect diseases.</p>
+    return (
+      <div className="space-y-6">
+        {/* Disease Detection Result */}
+        <div className="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-lg border border-green-200">
+          <div className="flex items-center mb-3">
+            <CheckCircle className="w-6 h-6 text-green-600 mr-2" />
+            <h3 className="text-lg font-semibold text-gray-800">
+              Detection Result
+            </h3>
           </div>
-          <div className='flex flex-row justify-center animate-in'>
-            <button className="p-2 rounded-full hover:bg-gray-800 transition-colors">
-              <Bell className="w-5 h-5 text-gray-400" />
-            </button>
-            <div className="ml-4 w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center font-bold text-white text-sm">
-              JD
+          <div className="space-y-2">
+            <p className="text-sm text-gray-600">Disease:</p>
+            <p className="text-lg font-medium text-gray-800">
+              {currentPrediction?.disease || "N/A"}
+            </p>
+            <div className="flex items-center">
+              <TrendingUp className="w-4 h-4 text-blue-600 mr-1" />
+              <span className="text-sm text-gray-600">
+                Confidence:{" "}
+                {currentPrediction?.confidence
+                  ? `${currentPrediction.confidence}%`
+                  : "N/A"}
+              </span>
             </div>
           </div>
-        </header>
+        </div>
 
-        {/* Main Grid Layout */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
-          {/* Left Column (Main Content) */}
-          <div className="xl:col-span-2 space-y-8">
-            {/* Uploader Card */}
-            <div className="bg-[#1C1C1E] rounded-lg p-6 animate-in border border-gray-800 shadow-lg shadow-black/20" style={{ animationDelay: '0.1s' }}>
-              <h2 className="text-xl font-semibold text-white">Upload Image</h2>
-              <p className="text-sm text-gray-400 mt-1">Drag and drop your image or click to browse.</p>
-              <div {...getRootProps()} className={`mt-6 p-8 border-2 border-dashed rounded-lg text-center cursor-pointer transition-colors ${isDragActive ? 'border-green-500 bg-green-900/20 ring-2 ring-green-500' : 'border-gray-600 hover:border-gray-500'}`}>
-                <input {...getInputProps()} />
-                <UploadCloud className="w-10 h-10 mx-auto text-gray-500 mb-3" />
-                {isDragActive ? (
-                  <p className="text-lg font-semibold text-green-400">Drop files here...</p>
+        {/* AI Recommendations */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+            <span className="w-2 h-2 bg-green-600 rounded-full mr-2"></span>
+            AI Recommendations
+          </h3>
+
+          <div className="space-y-4">
+            {/* Treatment */}
+            <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+              <h4 className="font-semibold text-red-800 mb-2">
+                Immediate Treatment
+              </h4>
+              <p className="text-sm text-gray-700">
+                {currentRecommendation?.treatment || "N/A"}
+              </p>
+            </div>
+
+            {/* Prevention */}
+            <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+              <h4 className="font-semibold text-yellow-800 mb-2">Prevention</h4>
+              <p className="text-sm text-gray-700">
+                {currentRecommendation?.prevention || "N/A"}
+              </p>
+            </div>
+
+            {/* Fertilizers */}
+            <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+              <h4 className="font-semibold text-green-800 mb-2">
+                Recommended Fertilizers
+              </h4>
+              <div className="text-sm text-gray-700">
+                {currentRecommendation?.fertilizers &&
+                currentRecommendation.fertilizers.length > 0 ? (
+                  <ul className="list-disc list-inside space-y-1">
+                    {currentRecommendation.fertilizers.map(
+                      (fertilizer, index) => (
+                        <li key={index}>{fertilizer}</li>
+                      )
+                    )}
+                  </ul>
                 ) : (
-                  <div>
-                    <p className="font-semibold text-white">Drag & drop files here</p>
-                    <p className="text-sm text-gray-500 my-2">or</p>
-                    <button type="button" className="px-5 py-2 bg-green-600 text-white text-sm font-semibold rounded-md hover:bg-green-700 transition-colors">
-                      Browse Files
-                    </button>
-                    <p className="text-xs text-gray-500 mt-4">Supported formats: PNG, JPG, JPEG up to 10MB</p>
-                  </div>
+                  <span>N/A</span>
                 )}
               </div>
             </div>
 
-            {/* Uploaded Image Preview Card OR Placeholder */}
-            {file ? (
-                <div className="bg-[#1C1C1E] rounded-lg p-6 animate-in border border-gray-800 shadow-lg shadow-black/20" style={{ animationDelay: '0.2s' }}>
-                  <h2 className="text-xl font-semibold text-white">Uploaded Image Preview</h2>
-                  <p className="text-sm text-gray-400 mt-1">This is a preview of the image you've uploaded.</p>
-                  <div className="mt-4 w-full h-80 bg-gray-900/50 rounded-md flex items-center justify-center border border-gray-700">
-                      <img src={file.preview} alt="Preview" className="max-h-full max-w-full object-contain rounded-md" />
-                  </div>
-                </div>
-            ) : (
-                // --- This is the restored placeholder div ---
-                <div className="bg-[#1C1C1E] rounded-lg p-6 animate-in border border-gray-800 shadow-lg shadow-black/20 text-center flex flex-col justify-center h-[26.5rem]" style={{ animationDelay: '0.2s' }}>
-                   <UploadCloud className="w-12 h-12 mx-auto text-gray-600 mb-4" />
-                   <h3 className="text-xl font-semibold text-white">Upload an Image to Start</h3>
-                   <p className="text-gray-500 mt-2 max-w-xs mx-auto">Your uploaded image preview will appear here once you select a file.</p>
-                </div>
-            )}
-          </div>
+            {/* Watering Schedule */}
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+              <h4 className="font-semibold text-blue-800 mb-2">
+                Watering Schedule
+              </h4>
+              <p className="text-sm text-gray-700">
+                {currentRecommendation?.watering_schedule || "N/A"}
+              </p>
+            </div>
 
-          {/* Right Column (Sidebar) */}
-          <div className="xl:col-span-1">
-            <div className="sticky top-8 space-y-8">
-              {/* Photography Tips Card */}
-              <div className="bg-[#1C1C1E] rounded-lg p-6 animate-in border border-gray-800 shadow-lg shadow-black/20" style={{ animationDelay: '0.3s' }}>
-                <h3 className="text-xl font-semibold text-white">Photography Tips</h3>
-                <p className="text-sm text-gray-400 mt-1">For the best detection results.</p>
-                <ul className="mt-5 space-y-4">
-                  {photographyTips.map((tip, index) => (
-                    <li key={index} className="flex items-start">
-                      <div className="flex-shrink-0 w-5 h-5 bg-green-500/30 text-green-400 rounded-full flex items-center justify-center mr-3 mt-1 ring-1 ring-green-500/50">
-                        <Check className="w-3.5 h-3.5" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-300">{tip.text}</p>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Analyze Image Button */}
-              <div className="animate-in" style={{ animationDelay: '0.4s' }}>
-                <button
-                  onClick={handleAnalyze}
-                  disabled={!file}
-                  className="w-full bg-green-600 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed hover:scale-105 active:scale-100"
-                >
-                  Analyze Image
-                </button>
-              </div>
+            {/* General Care */}
+            <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+              <h4 className="font-semibold text-purple-800 mb-2">
+                General Care
+              </h4>
+              <p className="text-sm text-gray-700">
+                {currentRecommendation?.general_care || "N/A"}
+              </p>
             </div>
           </div>
         </div>
-      </main>
-    </div>
+      </div>
+    );
+  };
+
+  return (
+    <main
+      ref={componentRef}
+      className="bg-green-50/50 font-sans min-h-screen py-20 mt-10"
+    >
+      <div className="container mx-auto px-4">
+        <Header2 />
+        <div className="text-center mb-12 animate-in">
+          <div className="inline-block bg-green-600 text-white p-4 rounded-full mb-4">
+            <Camera className="w-8 h-8" />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-800 tracking-tight flex items-center justify-center gap-3">
+            <span className="h-[7vh] "> 📸 </span>
+            Crop Disease Detection
+          </h1>
+          <p className="mt-4 text-lg max-w-2xl mx-auto text-gray-600">
+            Upload a leaf image to get instant AI-powered disease diagnosis and
+            treatment recommendations.
+          </p>
+        </div>
+
+        {/* Main Content Area */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+          {/* Left Column: Uploader */}
+          <div
+            className="space-y-8 animate-in"
+            style={{ animationDelay: "0.2s" }}
+          >
+            <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm">
+              <h2 className="text-xl font-semibold text-gray-800">
+                Upload Leaf Image
+              </h2>
+              <p className="text-gray-500 mt-1">
+                Take a clear photo of the affected leaf for best results
+              </p>
+
+              <div
+                {...getRootProps()}
+                className={`mt-6 p-10 border-2 border-dashed rounded-lg text-center cursor-pointer transition-colors ${
+                  isDragActive
+                    ? "border-green-600 bg-green-50"
+                    : "border-gray-300 hover:border-green-500"
+                }`}
+              >
+                <input {...getInputProps()} />
+                <UploadCloud className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+                {isDragActive ? (
+                  <p className="text-lg font-semibold text-green-700">
+                    Drop the image here ...
+                  </p>
+                ) : (
+                  <div>
+                    <p className="text-lg font-semibold text-gray-700">
+                      Drag & drop your image here
+                    </p>
+                    <p className="text-gray-500 my-2">
+                      or click to browse your files
+                    </p>
+                    <button
+                      type="button"
+                      className="mt-4 px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md border border-gray-300 hover:bg-gray-200"
+                    >
+                      Choose File
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Image Preview */}
+              {file && (
+                <div className="mt-6">
+                  <div className="mb-4 rounded-lg overflow-hidden border">
+                    <img
+                      src={file.preview}
+                      alt="Uploaded leaf preview"
+                      className="w-full h-auto object-cover max-h-64"
+                    />
+                  </div>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Filename: {file.name}
+                  </p>
+                  <button
+                    onClick={handleStartDiagnosis}
+                    disabled={isUploading}
+                    className="w-full bg-green-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                  >
+                    {isUploading ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                        Processing...
+                      </>
+                    ) : (
+                      "Start Diagnosis"
+                    )}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Photography Tips */}
+            <div
+              className="p-8 rounded-xl border border-yellow-300 bg-yellow-50/50 animate-in"
+              style={{ animationDelay: "0.4s" }}
+            >
+              <div className="flex items-start">
+                <AlertTriangle className="w-6 h-6 text-yellow-600 mr-4 flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-800">
+                    Photography Tips
+                  </h3>
+                  <ul className="mt-3 list-disc list-inside text-gray-600 space-y-1">
+                    <li>Take photos in good natural lighting</li>
+                    <li>Focus on a single leaf with clear symptoms</li>
+                    <li>Ensure the leaf fills most of the frame</li>
+                    <li>Avoid blurry or overexposed images</li>
+                    <li>Include both healthy and affected areas</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Results */}
+          <div
+            className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm sticky top-28 animate-in max-h-screen overflow-y-auto"
+            style={{ animationDelay: "0.3s" }}
+          >
+            {renderRecommendationCard()}
+          </div>
+        </div>
+      </div>
+    </main>
   );
 };
 
 export default DiseaseDetectionPage;
-
