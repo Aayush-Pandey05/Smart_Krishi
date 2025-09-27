@@ -39,13 +39,13 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/contactus" element={<ContactUs />} />
-        <Route path="/soilhealth" element={<SoilHealth />} />
-        <Route path="/costcal" element={<CostCalculator />} />
-        <Route path="/irrigation" element={<IrrigationAdvisor />} />
-        <Route path="/fertilizer" element={<FertilizerGuide />} />
-        <Route path="/disease" element={<DiseaseDetection />} />
-        <Route path="/features" element={<Feature />} />
-        <Route path="/marketdashboard" element={<MarketDashboard />} />
+        <Route path="/soilhealth" element={ authUser?<SoilHealth />:<Login/>} />
+        <Route path="/costcal" element={authUser?<CostCalculator />:<Login/>} />
+        <Route path="/irrigation" element={authUser?<IrrigationAdvisor />:<Login/>} />
+        <Route path="/fertilizer" element={authUser?<FertilizerGuide />:<Login/>} />
+        <Route path="/disease" element={authUser?<DiseaseDetection />:<Login/>} />
+        <Route path="/features" element={authUser?<Feature />:<Login/>} />
+        <Route path="/marketdashboard" element={authUser?<MarketDashboard />:<Login/>} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
       </Routes>

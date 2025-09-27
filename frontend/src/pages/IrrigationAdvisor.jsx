@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Droplets, MapPin, Compass, Droplet } from 'lucide-react';
 import Header2 from '../components/Header2';
+import WeatherWidget from '../components/Weather';
 
 const SmartIrrigationAdvisorPage = () => {
   const [formData, setFormData] = useState({
@@ -125,6 +126,7 @@ const SmartIrrigationAdvisorPage = () => {
 
         </div>
       </div>
+      <WeatherWidget/>
     </main>
   );
 };
