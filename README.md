@@ -1,6 +1,6 @@
 # 🌱Smart_Krishi
 
-An intelligent web application for farmers that provides data-driven crop, fertilizer and disease recommendations — empowering agricultural decisions.  
+An intelligent web application and a app for farmers that provides data-driven crop, fertilizer and disease recommendations — empowering agricultural decisions.  
 Repository: [https://github.com/sharma-2712/Smart_Krishi](https://github.com/sharma-2712/Smart_Krishi)
 
 ---
